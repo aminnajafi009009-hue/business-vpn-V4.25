@@ -1,0 +1,10 @@
+aiogram==3.30.0
+flask==3.0.2
+python-dotenv==1.0.1
+cryptography==42.0.5
+libsql==0.1.11
+aiohttp==3.9.5
+qrcode[pil]==7.4.2
+requests==2.31.0
+gunicorn==23.0.0
+sentry-sdk[flask]==2.19.2

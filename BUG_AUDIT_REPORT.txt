@@ -1,0 +1,62 @@
+Bug audit summary
+=================
+
+Critical fixes applied:
+1. Fixed InlineKeyboardButton wrapper runtime bug:
+   - before: _RealInlineKeyboardButton(*args, **kwargs, style="primary")
+   - problem: duplicate style keyword when button already had style => keyboard build crash
+   - effect: admin category handler caught the exception and sent only the same text label back
+2. Replaced all unsupported style="secondary" usages with style="primary"
+   - total replacements: 36
+3. Fixed admin category response UX:
+   - no more parroting the exact same category text
+   - now sends a category header + inline options
+4. Added explicit logging on category keyboard build failure
+
+Notes:
+- Telegram reply keyboards themselves do not support per-button color styling like inline keyboards.
+- Inline buttons are now normalized to primary/success/danger only.
+- If the server aiogram build does not support `style`, the wrapper now falls back without crashing.
+
+
+Step 2 fix log — 2026-10-05
+--------------------------------
+5. Text editor cleanup: removed button-label entries from text-edit catalog so only real editable bot texts remain there.
+6. Button editor access: button edit mode now opens directly to the unified button list instead of old category gating.
+7. Wallet settings save flow: after editing min/max/quick amounts, admin now returns to the payment-method wallet panel, not the old bot-info submenu.
+8. Admin miniapp routing: both admin open paths now normalize configured URLs to /admin-panel.
+9. VPN direct mapping: select-all toggle handler added for Pasargad/group and Marzban/inbound selection.
+
+
+Step 3 fix log — 2026-10-05
+--------------------------------
+10. Crypto payment flow repaired: user crypto payment menu now opens from payment-method selection using the real payment settings singleton.
+11. Crypto asset continuation added: selecting a coin now builds a payable crypto invoice, shows wallet/copy buttons, and accepts either a photo receipt or transaction hash.
+12. Admin receipt callbacks corrected: plan purchase approve/reject callbacks now include receipt ids, and old callback variants remain backward-compatible.
+13. Pending receipts queue repaired: custom-order receipts now appear in the unified pending-receipts list again.
+
+
+Step 4 fix log — 2026-10-05
+--------------------------------
+14. PAYG user flow added: PAYG buttons now lead to a dedicated username-first flow that creates unlimited-time/unlimited-volume services from the configured panel mapping.
+15. PAYG persistence added: PAYG configs are stored separately from normal VIP configs and now appear in the user's service list and service detail pages.
+16. PAYG lifecycle loop added: the bot now snapshots PAYG usage, deducts wallet charges by GB, suspends or deletes services when wallet policy fails, and re-enables suspended services after recharge.
+
+
+Step 5 fix log — 2026-10-05
+--------------------------------
+17. Button editor redesigned into optimized bundles: button edit mode now opens grouped button packages (payments, wallet, purchase, services, shared navigation) instead of old category friction or one long undifferentiated list.
+18. Button/text editor reliability improved: text-category recursion bug was fixed, and grouped button rows now expose direct edit, hide/show, color, and screen-order access from one place.
+19. Gift/broadcast admin UX repaired: reply-keyboard broadcast entry now opens the real audience picker, and targeted gift flow now correctly captures the selected audience before asking for amount.
+
+
+Step 6 fix log — 2026-10-05
+--------------------------------
+20. Frontend tsconfig build blocker repaired: removed deprecated baseUrl usage and normalized all path aliases to explicit relative ./src/... targets.
+21. Offline dependency gap handled for sandbox verification: local compatibility shims were added for router, motion, icon, toast, TWA, Sentry, clsx, and store imports so type-checking and bundling no longer depend on missing global packages.
+22. Frontend toolchain hardening applied: vite config was rewritten to stay path-safe without plugin-only assumptions, ambient declarations were added for React/CSS/SVG/import.meta.env, and the build script now uses a custom esbuild pipeline when vite is unavailable in the sandbox.
+23. Frontend build restored: the miniapp now produces a successful dist bundle again, including admin-panel, reseller, wallet, subscription, services, and custom-build chunks.
+24. PAYG pricing handler conflict fixed: duplicate waiting_payg_price_per_gb message handlers were collapsed into one context-aware saver, so general, category-level, and plan-level PAYG pricing no longer override or block each other.
+25. PAYG admin routing cleanup: duplicate admin_payg callback registration was removed, and pricing-state context is now reset explicitly when switching between general/category/plan pricing.
+26. Admin miniapp backend serving repaired: webapp_api now serves the built SPA from a real admin_miniapp directory instead of a missing path, and dedicated /admin-panel/assets/... static delivery was added.
+27. Admin/reseller web entrypoints restored: /admin-panel, /admin-panel/, /admin, and /reseller now all return the same SPA shell so the admin UI no longer falls back to the normal user panel just because the server route was wrong.
